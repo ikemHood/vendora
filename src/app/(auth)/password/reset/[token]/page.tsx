@@ -1,6 +1,5 @@
 "use client";
 
-import { type NextPage } from "next";
 import { Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,9 +7,8 @@ import { Input } from "~/app/_components/Input";
 import { Button } from "~/app/_components/Button";
 import { resetPasswordSchema, type ResetPasswordInput } from "~/lib/validations/auth";
 
-const ResetPasswordPage: NextPage<{ params: { token: string } }> = ({
-    params: { token },
-}) => {
+
+function ResetPasswordPage({ params }: { params: Promise<{ token: string }> }) {
     const {
         register,
         handleSubmit,
@@ -26,7 +24,7 @@ const ResetPasswordPage: NextPage<{ params: { token: string } }> = ({
     const onSubmit = async (data: ResetPasswordInput) => {
         try {
             // TODO: Implement API call here with the token
-            console.log("Form submitted:", { ...data, token });
+            console.log("Form submitted:", { ...data, token: (await params).token });
         } catch (error) {
             console.error("Error submitting form:", error);
         }
