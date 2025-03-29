@@ -1,38 +1,42 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { SendCryptoModal } from "./modals/SendCryptoModal";
-import { ReceiveCryptoModal } from "./modals/ReceiveCryptoModal";
-import { SendFiatModal } from "./modals/SendFiatModal";
 import {
-    sendCryptoModalAtom,
-    receiveCryptoModalAtom,
-    sendFiatModalAtom
+	receiveCryptoModalAtom,
+	sendCryptoModalAtom,
+	sendFiatModalAtom,
 } from "~/app/_store/atoms";
+import { ReceiveCryptoModal } from "./modals/ReceiveCryptoModal";
+import { SendCryptoModal } from "./modals/SendCryptoModal";
+import { SendFiatModal } from "./modals/SendFiatModal";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-    const [isSendCryptoModalOpen, setIsSendCryptoModalOpen] = useAtom(sendCryptoModalAtom);
-    const [isReceiveModalOpen, setIsReceiveModalOpen] = useAtom(receiveCryptoModalAtom);
-    const [isSendFiatModalOpen, setIsSendFiatModalOpen] = useAtom(sendFiatModalAtom);
+	const [isSendCryptoModalOpen, setIsSendCryptoModalOpen] =
+		useAtom(sendCryptoModalAtom);
+	const [isReceiveModalOpen, setIsReceiveModalOpen] = useAtom(
+		receiveCryptoModalAtom,
+	);
+	const [isSendFiatModalOpen, setIsSendFiatModalOpen] =
+		useAtom(sendFiatModalAtom);
 
-    return (
-        <>
-            {children}
+	return (
+		<>
+			{children}
 
-            <SendCryptoModal
-                isOpen={isSendCryptoModalOpen}
-                onClose={() => setIsSendCryptoModalOpen(false)}
-            />
+			<SendCryptoModal
+				isOpen={isSendCryptoModalOpen}
+				onClose={() => setIsSendCryptoModalOpen(false)}
+			/>
 
-            <ReceiveCryptoModal
-                isOpen={isReceiveModalOpen}
-                onClose={() => setIsReceiveModalOpen(false)}
-            />
+			<ReceiveCryptoModal
+				isOpen={isReceiveModalOpen}
+				onClose={() => setIsReceiveModalOpen(false)}
+			/>
 
-            <SendFiatModal
-                isOpen={isSendFiatModalOpen}
-                onClose={() => setIsSendFiatModalOpen(false)}
-            />
-        </>
-    );
-} 
+			<SendFiatModal
+				isOpen={isSendFiatModalOpen}
+				onClose={() => setIsSendFiatModalOpen(false)}
+			/>
+		</>
+	);
+}

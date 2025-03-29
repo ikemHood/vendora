@@ -4,16 +4,16 @@ import { BottomNav } from "~/app/_components/BottomNav";
 import { Providers } from "~/app/_components/Providers";
 
 export default function DashboardLayout({
-    children,
+	children,
 }: {
-    children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-    return (
-        <Providers>
-            <div className="flex flex-col min-h-screen">
-                {children}
-                <BottomNav />
-            </div>
-        </Providers>
-    );
-} 
+	return (
+		<Providers>
+			<div className="flex min-h-screen flex-col">
+				{children}
+				<BottomNav />
+			</div>
+		</Providers>
+	);
+}
