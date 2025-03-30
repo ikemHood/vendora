@@ -3,6 +3,7 @@
 import { Header } from "~/app/_components/Header";
 import { Transaction as TransactionComponent } from "~/app/_components/Transaction";
 import { WalletCard } from "~/app/_components/WalletCard";
+import { LoadingSpinner } from "~/app/_components/LoadingSpinner";
 import { api } from "~/trpc/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -71,7 +72,7 @@ export default function HomePage() {
     if (isLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-lg">Loading...</div>
+                <LoadingSpinner size="large" />
             </div>
         );
     }
