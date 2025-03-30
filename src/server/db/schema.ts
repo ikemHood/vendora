@@ -28,7 +28,7 @@ export const users = pgTable("users", {
 	name: varchar("name", { length: 255 }).notNull(),
 	password: varchar("password", { length: 255 }).notNull(),
 	isVerified: boolean("is_verified").default(false),
-	documentVerificationId: uuid("document_verification_id"),
+	documentVerification: uuid("document_verification_id").references(() => documentVerifications.id),
 	verificationCode: varchar("verification_code", { length: 6 }),
 	verificationCodeExpires: timestamp("verification_code_expires"),
 	resetPasswordCode: varchar("reset_password_code", { length: 64 }),
@@ -40,16 +40,18 @@ export const users = pgTable("users", {
 // Document Verification table
 export const documentVerifications = pgTable("document_verifications", {
 	id: uuid("id").defaultRandom().primaryKey(),
-	userId: uuid("user_id").notNull(),
+	userId: uuid("user_id").notNull().references(() => users.id),
 	idDoc: varchar("id_doc", { length: 255 }),
 	cacDoc: varchar("cac_doc", { length: 255 }),
+	idDocData: text("id_doc_data"),
+	cacDocData: text("cac_doc_data"),
 	uploadedDocAt: timestamp("uploaded_doc_at"),
 	isDocVerified: boolean("is_doc_verified").default(false),
 	verificationStatus: varchar("verification_status", { length: 50 }).default(
 		"pending",
 	), // pending, approved, rejected
 	rejectionReason: text("rejection_reason"),
-	verifiedBy: uuid("verified_by"),
+	verifiedBy: uuid("verified_by").references(() => users.id),
 	verifiedAt: timestamp("verified_at"),
 	documentType: documentTypeEnum("document_type").notNull(),
 	documentNumber: varchar("document_number", { length: 100 }),

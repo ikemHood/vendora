@@ -20,6 +20,9 @@ const CreateAccountPage: NextPage = () => {
     const register = api.auth.register.useMutation({
         onSuccess: (data) => {
             toast.success("Account created successfully!");
+            if (data.token) {
+                localStorage.setItem("access_token", data.token);
+            }
             if (data.requiresVerification) {
                 router.push("/verify/business");
             } else {

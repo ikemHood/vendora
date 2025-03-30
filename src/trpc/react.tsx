@@ -53,8 +53,12 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
 					transformer: SuperJSON,
 					url: `${getBaseUrl()}/api/trpc`,
 					headers: () => {
+						const token = typeof window !== "undefined" ? window.localStorage.getItem("access_token") : null;
 						const headers = new Headers();
 						headers.set("x-trpc-source", "nextjs-react");
+						if (token) {
+							headers.set("Authorization", `Bearer ${token}`);
+						}
 						return headers;
 					},
 				}),

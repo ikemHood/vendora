@@ -1,31 +1,31 @@
 import { z } from "zod";
 
-export const businessVerificationSchema = z.object({
-	idDocument: z
-		.custom<File>()
-		.refine((file) => file instanceof File, "ID document is required")
-		.refine(
-			(file) => ["application/pdf", "image/png"].includes(file.type),
-			"File must be PDF or PNG",
-		)
-		.refine(
-			(file) => file.size <= 5 * 1024 * 1024,
-			"File must be less than 5MB",
-		),
+const fileSchema = z.custom<File>((file) => file instanceof File, "File is required");
 
-	cacDocument: z
-		.custom<File>()
-		.refine((file) => file instanceof File, "CAC document is required")
-		.refine(
-			(file) => ["application/pdf", "image/png"].includes(file.type),
-			"File must be PDF or PNG",
-		)
-		.refine(
-			(file) => file.size <= 5 * 1024 * 1024,
-			"File must be less than 5MB",
-		),
+const fileDataSchema = z.object({
+    name: z.string(),
+    type: z.string(),
+    data: z.string().refine((data) => data.startsWith('data:'), "Invalid file data"),
+});
+
+export const businessVerificationSchema = z.object({
+    idDocument: z.union([
+        fileSchema,
+        fileDataSchema,
+    ]).refine(
+        (file) => ["application/pdf", "image/png", "image/jpeg", "image/jpg"].includes(file.type),
+        "File must be PDF, PNG, JPEG or JPG",
+    ),
+
+    cacDocument: z.union([
+        fileSchema,
+        fileDataSchema,
+    ]).refine(
+        (file) => ["application/pdf", "image/png", "image/jpeg", "image/jpg"].includes(file.type),
+        "File must be PDF, PNG, JPEG or JPG",
+    ),
 });
 
 export type BusinessVerificationInput = z.infer<
-	typeof businessVerificationSchema
+    typeof businessVerificationSchema
 >;

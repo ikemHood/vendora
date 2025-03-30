@@ -9,7 +9,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { verify } from "jsonwebtoken";
 import { env } from "~/env";
 
@@ -112,7 +112,7 @@ const JWT_SECRET = env.JWT_SECRET || "your-secret-key";
 
 const isAuthed = t.middleware(async ({ next }) => {
 	const cookieStore = await cookies();
-	const token = cookieStore.get("access_token")?.value;
+	const token = cookieStore.get("access_token")?.value || (await headers()).get("authorization")?.split(" ")[1];
 
 	if (!token) {
 		throw new TRPCError({

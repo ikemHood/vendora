@@ -11,9 +11,9 @@ export const verificationRouter = createTRPCRouter({
             // Check if user is already verified
             const user = await ctx.db.query.users.findFirst({
                 where: eq(users.id, ctx.userId),
-                with: {
-                    documentVerifications: true,
-                },
+                // with: {
+                //     documentVerification: true,
+                // },
             });
 
             if (!user) {
@@ -22,7 +22,7 @@ export const verificationRouter = createTRPCRouter({
                     message: "User not found",
                 });
             }
-
+            console.log("user", user);
             if (user.isVerified) {
                 throw new TRPCError({
                     code: "BAD_REQUEST",
@@ -30,17 +30,32 @@ export const verificationRouter = createTRPCRouter({
                 });
             }
 
-            // TODO: Upload files to storage (e.g., S3)
-            // For now, we'll just store the file names
-            const idDocPath = `verifications/${ctx.userId}/id_doc.${input.idDocument.name.split('.').pop()}`;
-            const cacDocPath = `verifications/${ctx.userId}/cac_doc.${input.cacDocument.name.split('.').pop()}`;
+            // Check if user has pending verification
+            const pendingVerification = await ctx.db.query.documentVerifications.findFirst({
+                where: eq(documentVerifications.userId, ctx.userId),
+            });
 
+            if (pendingVerification && pendingVerification.verificationStatus === "pending") {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "You already have a pending verification",
+                });
+            }
+
+            // Generate unique file names
+            const timestamp = Date.now();
+            const idDocPath = `verifications/${ctx.userId}/id_doc_${timestamp}.${input.idDocument.name.split('.').pop()}`;
+            const cacDocPath = `verifications/${ctx.userId}/cac_doc_${timestamp}.${input.cacDocument.name.split('.').pop()}`;
+
+            // Create verification record with base64 data
             const [verification] = await ctx.db
                 .insert(documentVerifications)
                 .values({
                     userId: ctx.userId,
                     idDoc: idDocPath,
                     cacDoc: cacDocPath,
+                    idDocData: 'data' in input.idDocument ? input.idDocument.data : null,
+                    cacDocData: 'data' in input.cacDocument ? input.cacDocument.data : null,
                     uploadedDocAt: new Date(),
                     documentType: "cac_registration",
                     verificationStatus: "pending",
@@ -57,11 +72,15 @@ export const verificationRouter = createTRPCRouter({
             await ctx.db
                 .update(users)
                 .set({
-                    documentVerificationId: verification.id,
+                    documentVerification: verification.id,
                 })
                 .where(eq(users.id, ctx.userId));
 
-            return { success: true };
+            return {
+                success: true,
+                message: "Verification documents submitted successfully",
+                verificationId: verification.id
+            };
         }),
 
     getVerificationStatus: protectedProcedure.query(async ({ ctx }) => {
@@ -81,8 +100,8 @@ export const verificationRouter = createTRPCRouter({
 
         return {
             isVerified: user.isVerified,
-            verificationStatus: user.documentVerificationsId?.verificationStatus,
-            rejectionReason: user.documentVerificationsId?.rejectionReason,
+            verificationStatus: user.documentVerification?.verificationStatus,
+            rejectionReason: user.documentVerification?.rejectionReason,
         };
     }),
 }); 

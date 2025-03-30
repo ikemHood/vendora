@@ -16,6 +16,9 @@ const LoginPage: NextPage = () => {
     const login = api.auth.login.useMutation({
         onSuccess: (data) => {
             toast.success("Successfully logged in!");
+            if (data.token) {
+                localStorage.setItem("access_token", data.token);
+            }
             if (data.requiresVerification) {
                 router.push("/verify/business");
             } else {

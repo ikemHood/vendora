@@ -42,8 +42,35 @@ const BusinessVerificationPage: NextPage = () => {
     const idDocument = watch("idDocument");
     const cacDocument = watch("cacDocument");
 
+    const convertFileToBase64 = (file: File): Promise<{ name: string; type: string; data: string }> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                resolve({
+                    name: file.name,
+                    type: file.type,
+                    data: reader.result as string,
+                });
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
     const onSubmit = async (data: BusinessVerificationInput) => {
-        submitVerification.mutate(data);
+        try {
+            // Convert files to base64
+            const idDocBase64 = await convertFileToBase64(data.idDocument as File);
+            const cacDocBase64 = await convertFileToBase64(data.cacDocument as File);
+
+            // Send the base64 data
+            submitVerification.mutate({
+                idDocument: idDocBase64,
+                cacDocument: cacDocBase64,
+            });
+        } catch (error) {
+            toast.error("Error processing files. Please try again.");
+        }
     };
 
     const handleContinue = () => {
@@ -69,7 +96,7 @@ const BusinessVerificationPage: NextPage = () => {
                         <FileUpload
                             onFileSelect={(file) => setValue("idDocument", file)}
                             error={errors.idDocument?.message}
-                            value={idDocument}
+                            value={idDocument as File}
                         />
                     </div>
 
@@ -80,7 +107,7 @@ const BusinessVerificationPage: NextPage = () => {
                         <FileUpload
                             onFileSelect={(file) => setValue("cacDocument", file)}
                             error={errors.cacDocument?.message}
-                            value={cacDocument}
+                            value={cacDocument as File}
                         />
                     </div>
 

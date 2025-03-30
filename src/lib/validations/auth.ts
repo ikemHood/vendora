@@ -15,7 +15,7 @@ export const createAccountSchema = z.object({
         .string()
         .regex(
             /^\+?[1-9]\d{1,14}$/,
-            "Please enter a valid phone number following E.164 format",
+            "Please enter a valid international format phone number. e.g +2348060000000",
         ),
 
     email: z

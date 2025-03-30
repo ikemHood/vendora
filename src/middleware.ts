@@ -17,7 +17,8 @@ export async function middleware(request: NextRequest) {
 
         try {
             // Verify the token
-            verify(token, JWT_SECRET);
+            const decoded = verify(token, JWT_SECRET);
+            console.log("decoded", decoded);
             return NextResponse.next();
         } catch (error) {
             // If token is invalid, redirect to login
