@@ -86,7 +86,7 @@ const LoginPage: NextPage = () => {
                 <p className="mt-4 text-center text-gray-600 text-sm">
                     Don't have an account?{" "}
                     <Link
-                        href="/create-account"
+                        href="/register"
                         className="font-medium text-blue-600 hover:text-blue-700"
                     >
                         Create Account
